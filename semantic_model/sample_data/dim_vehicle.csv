@@ -1,0 +1,4 @@
+vehicle_id,vehicle_key,brand,fuel_type,is_active,model,transmission,variant,vehicle_segment
+1,V001,AutoX,Petrol,True,AX1,Auto,Base,Compact
+2,V002,AutoX,Diesel,True,AX2,Manual,Sport,SUV
+3,V003,Motori,Hybrid,True,M100,Auto,Premium,Sedan

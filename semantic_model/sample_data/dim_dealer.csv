@@ -1,0 +1,4 @@
+dealer_id,dealer_key,dealer_name,city,region,is_active
+1,D001,North Motors,Springfield,North,True
+2,D002,East Auto,Riverdale,East,True
+3,D003,West Cars,Lakeside,West,False
