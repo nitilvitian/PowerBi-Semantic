@@ -1,0 +1,82 @@
+{
+  "createOrReplace": {
+    "object": { "database": "PowerBiSemantic_Presentation" },
+    "database": {
+      "name": "PowerBiSemantic_Presentation",
+      "compatibilityLevel": 1500,
+      "model": {
+        "name": "PowerBiSemantic_Presentation_Model",
+        "tables": [
+          {
+            "name": "dim_date",
+            "columns": [
+              { "name": "date_key", "dataType": "int64", "annotations": [{"name":"description","value":"Surrogate date key"}] },
+              { "name": "full_date", "dataType": "datetime", "annotations": [{"name":"description","value":"Full calendar date for time intelligence"}] },
+              { "name": "month_name", "dataType": "string" }
+            ]
+          },
+          {
+            "name": "dim_dealer",
+            "columns": [
+              { "name": "dealer_key", "dataType": "string" },
+              { "name": "dealer_name", "dataType": "string" },
+              { "name": "region", "dataType": "string" }
+            ],
+            "annotations": [{"name":"description","value":"Dealer dimension (business key used for joins)"}]
+          },
+          {
+            "name": "dim_vehicle",
+            "columns": [
+              { "name": "vehicle_key", "dataType": "string" },
+              { "name": "brand", "dataType": "string" },
+              { "name": "vehicle_segment", "dataType": "string" }
+            ]
+          },
+          {
+            "name": "fact_sales_aggr",
+            "columns": [
+              { "name": "date_key", "dataType": "int64" },
+              { "name": "dealer_key", "dataType": "string" },
+              { "name": "vehicle_key", "dataType": "string" },
+              { "name": "total_sales_amount", "dataType": "double" },
+              { "name": "total_cost", "dataType": "double" },
+              { "name": "total_units_sold", "dataType": "int64" }
+            ]
+          },
+          {
+            "name": "fact_service_aggr",
+            "columns": [
+              { "name": "date_key", "dataType": "int64" },
+              { "name": "dealer_key", "dataType": "string" },
+              { "name": "vehicle_key", "dataType": "string" },
+              { "name": "total_service_revenue", "dataType": "double" },
+              { "name": "total_service_cost", "dataType": "double" }
+            ]
+          },
+          {
+            "name": "measure",
+            "columns": [],
+            "measures": [
+              { "name": "Total Sales", "expression": "SUM('fact_sales_aggr'[total_sales_amount])", "displayFolder": "Sales" },
+              { "name": "Total Units Sold", "expression": "SUM('fact_sales_aggr'[total_units_sold])", "displayFolder": "Sales" },
+              { "name": "Total Cost", "expression": "SUM('fact_sales_aggr'[total_cost])", "displayFolder": "Sales" },
+              { "name": "Gross Margin", "expression": "[Total Sales] - [Total Cost]", "displayFolder": "Profitability" },
+              { "name": "Gross Margin %", "expression": "DIVIDE([Gross Margin],[Total Sales],0)", "displayFolder": "Profitability" },
+              { "name": "Average Selling Price (ASP)", "expression": "DIVIDE([Total Sales],[Total Units Sold],0)", "displayFolder": "Sales" },
+              { "name": "Revenue YTD", "expression": "TOTALYTD([Total Sales],'dim_date'[full_date])", "displayFolder": "Time Intelligence" },
+              { "name": "Revenue LY", "expression": "CALCULATE([Total Sales], SAMEPERIODLASTYEAR('dim_date'[full_date]))", "displayFolder": "Time Intelligence" },
+              { "name": "Dealer Revenue Contribution %", "expression": "DIVIDE([Total Sales], CALCULATE([Total Sales], ALL('dim_dealer')), 0)", "displayFolder": "Analytics" },
+              { "name": "_DoNotUse - Placeholder", "expression": "BLANK()", "displayFolder": "Internal" }
+            ]
+          }
+        ],
+        "relationships": [
+          { "name": "r_date_sales", "from": { "table": "dim_date", "column": "date_key" }, "to": { "table": "fact_sales_aggr", "column": "date_key" }, "type": "ManyToOne" },
+          { "name": "r_dealer_sales", "from": { "table": "dim_dealer", "column": "dealer_key" }, "to": { "table": "fact_sales_aggr", "column": "dealer_key" }, "type": "ManyToOne" },
+          { "name": "r_vehicle_sales", "from": { "table": "dim_vehicle", "column": "vehicle_key" }, "to": { "table": "fact_sales_aggr", "column": "vehicle_key" }, "type": "ManyToOne" },
+          { "name": "r_date_service", "from": { "table": "dim_date", "column": "date_key" }, "to": { "table": "fact_service_aggr", "column": "date_key" }, "type": "ManyToOne" }
+        ]
+      }
+    }
+  }
+}
